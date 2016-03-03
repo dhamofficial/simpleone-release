@@ -18,6 +18,7 @@ namespace Service.Models
         public DbSet<ReleaseType> ReleaseTypes { get; set; }
         public DbSet<Location> Locations { get; set; }
         public DbSet<ReleaseItem> ReleaseItems { get; set; }
+        public DbSet<Subscription> Subscriptions { get; set; }
 
     }
 }

@@ -90,18 +90,16 @@
         </div>
           <table class="table table-striped">
               <tr>
-               <tr>
-                    <th>#</th>
-                    <th>Customer</th>
-                    <th>Version</th>
-                    <th>Build Number</th>
-                    <th>Build Date</th>
-                    <th>Environment</th>
-                    <th>Release Type</th>
-                    <th>Release Date</th>
-                </tr>
+                  <th>#</th>
+                  <th>Customer</th>
+                  <th>Version</th>
+                  <th>Build Number</th>
+                  <th>Build Date</th>
+                  <th>Environment</th>
+                  <th>Release Type</th>
+                  <th>Release Date</th>
               </tr>
-             <tr ng-repeat="row in Items track by row.uid" ng-click="edit($index,row)">
+             <tr ng-repeat="row in RecentList track by $index" ng-click="edit($index,row)">
                   <td ng-bind="$index+1"></td>
                   <td ng-bind="row.Customer.name"></td>
                   <td ng-bind="row.Version"></td>
@@ -111,7 +109,7 @@
                   <td ng-bind="row.ReleaseType.name"></td>
                   <td ng-bind="row.Created"></td>
               </tr>
-               <tr ng-show="!Items || Items.length==0">
+               <tr ng-show="!RecentList || RecentList.length==0">
                         <td colspan="8"><center>No releases yet. <a href="#/add">Create One</a></center> </td>
                     </tr>
             </table>
@@ -181,12 +179,12 @@
         <div class="col-md-3">
             <div class="form-group" ng-show="visibility1">
                 <label class="control-label" for="inputLarge">Location</label>
-                <select class="form-control" ng-model="Item.Location">
+                <select class="form-control" ng-model="Item.Location" ng-options="value.Id as value.Name for value in Locations">
                 </select>
             </div>
             <div class="form-group" ng-show="visibility1">
                 <label class="control-label" for="inputLarge">Subscription</label>
-                <select class="form-control" ng-model="Item.Subscription"></select>
+                <select class="form-control" ng-model="Item.Subscription" ng-options="value.Id as value.Name for value in Subscriptions"></select>
             </div>
             <div class="form-group" ng-show="visibility1">
                 <label class="control-label" for="inputLarge">Hostname</label>

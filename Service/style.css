@@ -71,3 +71,6 @@ strong {
  margin-bottom:10px !important; 
 }
 .navbar,.form-control{border-radius:0px !important;}
+tags-input .tags .tag-item{background-color: #00a600 !important;
+    color: white; border-radius:0px !important;
+    border: 0px !important;background:#00a600 !important;}

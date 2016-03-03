@@ -198,9 +198,12 @@ app.factory('DataService',function($q,$http){
   }
   service.savedata=function(item){
       var d = $q.defer();
-      $http.post(config.url, JSON.stringify(item), { headers: { 'Content-Type': 'application/json' } })
-          .success(function (data) { d.resolve(data); })
-      .error(function (data) { d.reject(data); });
+      $http.post(config.url, JSON.stringify(item), { headers: { 'Content-Type': 'application/json' } }).success(function (data) { d.resolve(data); }).error(function (data) { d.reject(data); });
+      return d.promise;
+  }
+  service.getrecentlist = function () {
+      var d = $q.defer();
+      $http.get(config.url + '?action="recentlist"', "", { headers: { 'Content-Type': 'application/json' } }).success(function (data) { d.resolve(data); }).error(function (data) { d.reject(data); });
       return d.promise;
   }
   return service;
@@ -221,15 +224,7 @@ app.controller('MainCtrl', function ($scope, localStorageService, $location, $ro
   $scope.init=function(){
     data = DataService;
     data.init();
-    
-    data.getdata().then(function(d){
-        $scope.Customers = d.Customers;
-        $scope.ReleaseTypes = d.ReleaseTypes;
-        $scope.Environments = d.Environments;
-        $scope.Locations = d.Locations;
-        $scope.Subscriptions = d.Subscriptions;
-    });
-    
+
     $scope.$watch('[Item.Environment]', function (values) {
         if (values && values[0]) {
             var myRedObjects = $filter('filter')($scope.Environments, { Id: values[0] })[0];
@@ -246,12 +241,22 @@ app.controller('MainCtrl', function ($scope, localStorageService, $location, $ro
      
     var v=localStorageService.get(key);
     if(v && v!='')$scope.Items=JSON.parse(v);
-    $scope.newmode=true;
+    $scope.newmode = true;
+    
     if($routeParams.ind){
       $scope.newmode=false;
       $scope.loadData($routeParams.ind);
-    }else{
-      
+    } else {
+        data.getdata().then(function (d) {
+            $scope.Customers = d.Customers;
+            $scope.ReleaseTypes = d.ReleaseTypes;
+            $scope.Environments = d.Environments;
+            $scope.Locations = d.Locations;
+            $scope.Subscriptions = d.Subscriptions;
+        });
+        data.getrecentlist().then(function (recentlist) {
+            $scope.RecentList = recentlist;
+        });
     }
   }
   $scope.init();
@@ -279,20 +284,21 @@ app.controller('MainCtrl', function ($scope, localStorageService, $location, $ro
   }
   
   $scope.edit=function(index){
-    $location.path('/addnew/'+index);
+    $location.path('/add/'+index);
   }
-  $scope.loadData=function(index){
-    $scope.selectedIndex=index;
-    $scope.Item=$scope.Items[index];
+  $scope.loadData = function (index) {
+      console.log($scope.RecentList);
+    $scope.selectedIndex = index;
+    $scope.Item=$scope.RecentList[index];
   }
   $scope.saveTrans=function(t){
     //if(t.due && t.due!='')t.due=moment(t.due).format(datetimeformat);
        
       $scope.savetodb(t).then(function (data) {
-          growl.success("Release saved.");
+          growl.success("Great, Release information saved");
           $scope.cancel();
       }, function (reason) {
-          growl.error(reason, { title: 'ALERT WE GOT ERROR' });
+          growl.error(reason, { title: 'Oh no, Something went wrong! :-)' });
       });
     
     //growl.warning("This adds a warn message", {title: 'Warning!'});

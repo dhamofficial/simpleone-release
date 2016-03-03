@@ -22,9 +22,18 @@ namespace Service.Controllers
             master.Environments = db.Environments.ToList();
             master.Locations = db.Locations.ToList();
             master.ReleaseTypes = db.ReleaseTypes.ToList();
+            master.Subscriptions = db.Subscriptions.ToList();
 
 
             return Json(master);
+        }
+
+        [HttpGet]
+        public IHttpActionResult GetMasters(string action)
+        {
+            int count = 10;
+            var releases = db.ReleaseItems.OrderByDescending(o => o.Id).Take(count);
+            return Json(releases);
         }
 
         [HttpPost]
