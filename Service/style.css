@@ -29,6 +29,7 @@ strong {
   background: #fff;
   padding: 20px;
   margin-bottom: 20px;
+  cursor:hand;cursor:pointer;
 }
 .tile .title {
   margin-top: 0px;
@@ -48,6 +49,7 @@ strong {
 .tile.red:hover {
   background: #7f132d;
 }
+.tile.green{
   background: #00a600;
 }
 .tile.green:hover {

@@ -70,19 +70,24 @@
                 </div>
               </div>
                <div class="col-sm-3 col-xs-3 col-md-3">
-                <div class="tile blue">
+                <div class="tile purple">
                   <h3 class="title">NEXT MONTH </h3>
                   <h4>5</h4>
                 </div>
               </div>
                <div class="col-sm-3 col-xs-3 col-md-3">
-                <div class="tile orange">
+                <div class="tile green">
                   <h3 class="title">OLD RELEASES </h3>
                   <h4>5</h4>
                 </div>
               </div>
                 
           </div>
+        <div class="row">
+            <div class="pull-left col-md-4">
+                <h3>Recent Releases</h3>
+            </div>            
+        </div>
           <table class="table table-striped">
               <tr>
                <tr>
@@ -117,7 +122,7 @@
         <div class="col-md-3">        
             <div class="form-group">
                 <label class="control-label" for="inputLarge">Customer</label>
-                <select name="mySelect" id="mySelect" class="form-control" ng-options="option.Name for option in Customers track by option.Id" ng-model="Item.Customer"></select>
+                <select name="mySelect" id="mySelect" class="form-control" ng-options="value.Id as value.Name for value in Customers" ng-model="Item.Customer"></select>
             </div>
             <div class="form-group">
                 <label class="control-label" for="inputDefault">Version</label>
@@ -134,11 +139,12 @@
             </div>
             <div class="form-group">
                 <label class="control-label" for="inputLarge">Environment</label>
-                <select name="mySelect" id="mySelect" class="form-control" ng-options="option.Name for option in Environments track by option.Name" ng-model="Item.Environment"></select>                
+                <select name="mySelect" id="mySelect" class="form-control" ng-options="value.Id as value.Name for value in Environments" ng-model="Item.Environment"></select>                
             </div>
             <div class="form-group">
                 <label class="control-label" for="inputLarge">Release Type *</label>
-                <select name="mySelect" id="mySelect" class="form-control" ng-options="option.Name for option in ReleaseTypes track by option.Id" ng-model="Item.ReleaseType"></select>         
+                <select name="mySelect" id="mySelect" class="form-control" ng-options="value.Id as value.Name for value in ReleaseTypes" ng-model="Item.ReleaseType"></select>         
+                <!--<select name="mySelect" id="mySelect" class="form-control" ng-options="option.Name for option in ReleaseTypes track by option.Id" ng-model="Item.ReleaseType"></select>-->         
             </div>
             <div class="form-group hide">
                 <label class="control-label" for="inputLarge">License Expiry Date</label>
@@ -146,58 +152,58 @@
             </div>
         </div>
         <div class="col-md-3">
-            <div class="form-group" ng-show="Item.Environment.Name=='Cloud'">
+            <div class="form-group" ng-show="visibility1">
                 <label class="control-label" for="inputLarge">Cloud URL</label>
                 <tags-input ng-model="Item.CloudUrl" placeholder="add cloud url"></tags-input>
             </div>
-            <div class="form-group" ng-show="Item.Environment.Name=='Cloud'">
+            <div class="form-group" ng-show="visibility1">
                 <label class="control-label" for="inputDefault">DNS URL</label>
                 <tags-input ng-model="Item.DnsUrl" placeholder="add dns url"></tags-input>
             </div>
-            <div class="form-group" ng-show="Item.Environment.Name=='Cloud'">
+            <div class="form-group" ng-show="visibility1">
                 <label class="control-label" for="inputSmall">Mobile URL</label>
                 <tags-input ng-model="Item.MobileUrl" placeholder="add mobile url"></tags-input>
             </div>
-            <div class="form-group" ng-show="Item.Environment.Name=='Cloud'">
+            <div class="form-group" ng-show="visibility1">
                 <label class="control-label" for="inputSmall">DB Server</label>
                 <input class="form-control" type="text" ng-model="Item.DbServer" placeholder="database server path" />
             </div>
-            <div class="form-group" ng-show="Item.Environment.Name=='Cloud'">
+            <div class="form-group" ng-show="visibility1">
                 <label class="control-label" for="inputLarge">Database Name</label>
                 <input class="form-control" type="text" ng-model="Item.DbName" placeholder="" />
             </div>
-            <div class="form-group" ng-show="Item.Environment.Name=='Cloud'">
+            <div class="form-group" ng-show="visibility1">
                 <label class="control-label" for="inputLarge">Modules</label>
                 <tags-input ng-model="Item.Modules" min-length="2" placeholder="add modules"></tags-input>
             </div>
       
         </div>
         <div class="col-md-3">
-            <div class="form-group" ng-show="Item.Environment.Name=='Cloud'">
+            <div class="form-group" ng-show="visibility1">
                 <label class="control-label" for="inputLarge">Location</label>
                 <select class="form-control" ng-model="Item.Location">
                 </select>
             </div>
-            <div class="form-group" ng-show="Item.Environment.Name=='Cloud'">
+            <div class="form-group" ng-show="visibility1">
                 <label class="control-label" for="inputLarge">Subscription</label>
                 <select class="form-control" ng-model="Item.Subscription"></select>
             </div>
-            <div class="form-group" ng-show="Item.Environment.Name=='Cloud'">
+            <div class="form-group" ng-show="visibility1">
                 <label class="control-label" for="inputLarge">Hostname</label>
                 <input class="form-control" type="text" ng-model="Item.Hostname" />
             </div>
-            <div class="form-group" ng-show="Item.Environment.Name=='Cloud'">
+            <div class="form-group" ng-show="visibility1">
                 <label class="control-label" for="inputLarge">VM Size</label>
                 <tags-input ng-model="Item.VmSize" placeholder="add VM size"></tags-input>
             </div>
-            <div class="form-group" ng-show="Item.Environment.Name=='Cloud'">
+            <div class="form-group" ng-show="visibility1">
                 <label class="control-label" for="inputLarge">Shared Instance</label>
                 <select class="form-control" ng-model="Item.SharedInstance">
                     <option>Yes</option>
                     <option>No</option>
                 </select>
             </div>
-            <div class="form-group" ng-show="Item.Environment.Name=='Cloud' && Item.SharedInstance=='Yes'">
+            <div class="form-group" ng-show="visibility1 && Item.SharedInstance=='Yes'">
                 <label class="control-label" for="inputLarge">Number of instances</label>
                 <select class="form-control" ng-model="Item.NumOfInstances">
                     <option value=""></option>
@@ -209,8 +215,8 @@
                 </select>
             </div>
         </div>
-        <div class="col-md-12">
-          <a class="btn btn-default" href="#/">Cancel</a>
+        <div class="col-md-6 pull-right">
+          <a class="btn btn-default pull-right" href="#/">Cancel</a>
           <button class="btn btn-success pull-right" ng-click="saveTrans(Item)">Save</button>
         </div>
       </div>

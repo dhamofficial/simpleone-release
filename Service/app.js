@@ -185,25 +185,27 @@ app.factory('DataService',function($q,$http){
     config.url='/Service/api/master';
   }
   service.getdata=function(){
-     var d = $q.defer();
-        var response = $http({
-                method: "GET", url: config.url, params: {}, headers: { 'Accept': 'application/json, text/javascript', 'Content-Type': 'application/json; charset=utf-8' }
-        }).success(function (data, status, headers, config) {
-            d.resolve(data);
-        }).error(function (data, status, headers, config) {
-            console.log('error');
-            return null;
-        });
-        
-        return d.promise;
+    var d = $q.defer();
+    var response = $http({
+            method: "GET", url: config.url, params: {}, headers: { 'Accept': 'application/json, text/javascript', 'Content-Type': 'application/json; charset=utf-8' }
+    }).success(function (data, status, headers, config) {
+        d.resolve(data);
+    }).error(function (data, status, headers, config) {
+        console.log('error');
+        return null;
+    });
+    return d.promise;
   }
   service.savedata=function(item){
-    
-    
+      var d = $q.defer();
+      $http.post(config.url, JSON.stringify(item), { headers: { 'Content-Type': 'application/json' } })
+          .success(function (data) { d.resolve(data); })
+      .error(function (data) { d.reject(data); });
+      return d.promise;
   }
   return service;
 });
-app.controller('MainCtrl', function($scope,localStorageService,$location,$routeParams,growl,DataService) {
+app.controller('MainCtrl', function ($scope, localStorageService, $location, $routeParams, growl, DataService, $q, $filter) {
   var remotedb=true;
   $scope.Items=[];
   var key='release_tracker';
@@ -211,7 +213,6 @@ app.controller('MainCtrl', function($scope,localStorageService,$location,$routeP
   var dateformat='YYYY-MM-DD'; 
   var data;
   $scope.selectedIndex=undefined;
-  
         
   $scope.changeView = function(view){$location.path(view);}
   $scope.changeMonth=function(index){
@@ -229,6 +230,14 @@ app.controller('MainCtrl', function($scope,localStorageService,$location,$routeP
         $scope.Subscriptions = d.Subscriptions;
     });
     
+    $scope.$watch('[Item.Environment]', function (values) {
+        if (values && values[0]) {
+            var myRedObjects = $filter('filter')($scope.Environments, { Id: values[0] })[0];
+            //console.log('watcher:', myRedObjects.Name,values[0], $scope.Environments[values[0] - 1]);
+            if (myRedObjects.Name == 'Cloud') $scope.visibility1 = true; else $scope.visibility1 = false;
+        }
+    });
+
     $scope.Item={};
     $('.datetimepicker').datetimepicker({format: datetimeformat});
     
@@ -240,7 +249,6 @@ app.controller('MainCtrl', function($scope,localStorageService,$location,$routeP
     $scope.newmode=true;
     if($routeParams.ind){
       $scope.newmode=false;
-      //console.log('edit index:',$routeParams.ind);
       $scope.loadData($routeParams.ind);
     }else{
       
@@ -248,14 +256,26 @@ app.controller('MainCtrl', function($scope,localStorageService,$location,$routeP
   }
   $scope.init();
   
-  $scope.savetodb=function(){
-    if(!remotedb){
-      var value=JSON.stringify($scope.Items);
-      localStorageService.set(key,value);
+  $scope.savetodb = function (t) {
+      var d = $q.defer();
+      if (!remotedb) {
+          if ($scope.selectedIndex)
+              $scope.Items[$scope.selectedIndex] = t;
+          else
+              $scope.Items.push(t);
+
+          var value=JSON.stringify($scope.Items);
+          localStorageService.set(key, value);
+          d.resolve('ok');
     }else{
-      
-      
+        console.log('adding item:', t);
+        data.savedata(t).then(function () {
+            d.resolve('ok');
+        }, function (reason) {
+            d.reject(reason);
+        });
     }
+    return d.promise;
   }
   
   $scope.edit=function(index){
@@ -267,18 +287,17 @@ app.controller('MainCtrl', function($scope,localStorageService,$location,$routeP
   }
   $scope.saveTrans=function(t){
     //if(t.due && t.due!='')t.due=moment(t.due).format(datetimeformat);
-    if($scope.selectedIndex)
-      $scope.Items[$scope.selectedIndex]=t;
-    else
-      $scope.Items.push(t);
        
-    $scope.savetodb();
+      $scope.savetodb(t).then(function (data) {
+          growl.success("Release saved.");
+          $scope.cancel();
+      }, function (reason) {
+          growl.error(reason, { title: 'ALERT WE GOT ERROR' });
+      });
     
     //growl.warning("This adds a warn message", {title: 'Warning!'});
     //growl.info("This adds a info message", {title: 'Random Information'});
-    growl.success("Release saved."); //no title here
     //growl.error("This adds a error message", {title: 'ALERT WE GOT ERROR'});
-    $scope.cancel();
   }
    
   $scope.clear=function(){

@@ -12,7 +12,7 @@ namespace Service.Controllers
     {
         private AppDbContext db = new AppDbContext();
 
-        // GET: api/Customers
+        // GET: api/GetMasters
         public IHttpActionResult GetMasters()
         {
 
@@ -25,6 +25,26 @@ namespace Service.Controllers
 
 
             return Json(master);
+        }
+
+        [HttpPost]
+        public IHttpActionResult PostItem(ReleaseItem item)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            if (item.Customer > 0)
+            {
+                db.ReleaseItems.Add(item);
+                db.SaveChanges();
+
+                return Ok(new { Action = "Success" });
+            }
+            else
+            {
+                return BadRequest("Invalid Parameters/Insufficient Parameters");
+            }
         }
     }
 }
