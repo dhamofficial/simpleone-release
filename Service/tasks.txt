@@ -1,0 +1,12 @@
+due date
+
+
+
+income this month
+expense paid
+expense pending
+
+
+provide month filter 
+
+provide copy option from last month
