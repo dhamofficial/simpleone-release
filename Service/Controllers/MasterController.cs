@@ -15,24 +15,14 @@ namespace Service.Controllers
         // GET: api/GetMasters
         public IHttpActionResult GetMasters()
         {
-
-            var master = new Masters();
-
-            master.Customers = db.Customers.ToList();
-            master.Environments = db.Environments.ToList();
-            master.Locations = db.Locations.ToList();
-            master.ReleaseTypes = db.ReleaseTypes.ToList();
-            master.Subscriptions = db.Subscriptions.ToList();
-
-
+            var master = db.GetMasters();
             return Json(master);
         }
 
         [HttpGet]
         public IHttpActionResult GetMasters(string action)
         {
-            int count = 10;
-            var releases = db.ReleaseItems.OrderByDescending(o => o.Id).Take(count);
+            var releases = db.GetRecentReleases();
             return Json(releases);
         }
 

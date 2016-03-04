@@ -9,12 +9,13 @@ namespace Service.Models
     {
         public int Id { get; set; }
         public int Customer { get; set; }
+        public string CustomerName { get; set; }
         public string Version { get; set; }
         public string BuildDate { get; set; }
         public string BuildNumber { get; set; }
         public int Environment { get; set; }
         public int ReleaseType { get; set; }
-
+        public string ReleaseTypeName { get; set; }
 
         public string CloudURL { get; set; }
         public string DNSURL { get; set; }

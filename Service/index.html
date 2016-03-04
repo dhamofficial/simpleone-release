@@ -60,25 +60,25 @@
               <div class="col-sm-3 col-xs-3 col-md-3">
                 <div class="tile blue">
                   <h3 class="title">THIS WEEK </h3>
-                  <h4>5</h4>
+                  <h5>5 DONE / 3 PENDING</h5>
                 </div>
               </div>
                <div class="col-sm-3 col-xs-3 col-md-3">
                 <div class="tile red">
                   <h3 class="title">THIS MONTH </h3>
-                  <h4>5</h4>
+                  <h5>6 RELEASED / 3 PENDING</h5>
                 </div>
               </div>
                <div class="col-sm-3 col-xs-3 col-md-3">
                 <div class="tile purple">
                   <h3 class="title">NEXT MONTH </h3>
-                  <h4>5</h4>
+                  <h5>3 NEW RELEASES</h5>
                 </div>
               </div>
                <div class="col-sm-3 col-xs-3 col-md-3">
                 <div class="tile green">
                   <h3 class="title">OLD RELEASES </h3>
-                  <h4>5</h4>
+                  <h5>25</h5>
                 </div>
               </div>
                 
@@ -95,19 +95,13 @@
                   <th>Version</th>
                   <th>Build Number</th>
                   <th>Build Date</th>
-                  <th>Environment</th>
-                  <th>Release Type</th>
-                  <th>Release Date</th>
               </tr>
              <tr ng-repeat="row in RecentList track by $index" ng-click="edit($index,row)">
                   <td ng-bind="$index+1"></td>
-                  <td ng-bind="row.Customer.name"></td>
+                  <td ng-bind="row.CustomerName"></td>
                   <td ng-bind="row.Version"></td>
                   <td ng-bind="row.BuildNumber"></td>
                   <td ng-bind="row.BuildDate"></td>
-                  <td ng-bind="row.Environment.name"></td>
-                  <td ng-bind="row.ReleaseType.name"></td>
-                  <td ng-bind="row.Created"></td>
               </tr>
                <tr ng-show="!RecentList || RecentList.length==0">
                         <td colspan="8"><center>No releases yet. <a href="#/add">Create One</a></center> </td>
