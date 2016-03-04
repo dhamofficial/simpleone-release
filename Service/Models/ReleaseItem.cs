@@ -29,5 +29,8 @@ namespace Service.Models
         public string VMSize { get; set; }
         public bool SharedInstance { get; set; }
         public int NumberOfInstances { get; set; }
+        public string EnvironmentName { get; set; }
+        public string LocationName { get; set; }
+        public string SubscriptionName { get; set; }
     }
 }

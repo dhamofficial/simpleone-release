@@ -3,9 +3,10 @@ app.config(function (localStorageServiceProvider,$routeProvider) {
   localStorageServiceProvider.setPrefix('releasemgmt');
   
   $routeProvider
-            .when('/', {templateUrl : 'dashboard.html',controller  : 'MainCtrl'})
-            .when('/add', {templateUrl : 'addexpense.html',controller  : 'MainCtrl'})
-            .when('/add/:ind',{controller: 'MainCtrl',templateUrl: 'addexpense.html'});
+    .when('/', {templateUrl : 'dashboard.html',controller  : 'MainCtrl'})
+    .when('/list', { templateUrl: 'releaselist.html', controller: 'MainCtrl' })
+    .when('/add', { templateUrl: 'addexpense.html', controller: 'MainCtrl' })
+    .when('/add/:ind',{controller: 'MainCtrl',templateUrl: 'addexpense.html'});
 
   //localStorageServiceProvider.setStorageType('sessionStorage');//default: localStorage
   //https://github.com/grevory/angular-local-storage
@@ -201,9 +202,12 @@ app.factory('DataService',function($q,$http){
       $http.post(config.url, JSON.stringify(item), { headers: { 'Content-Type': 'application/json' } }).success(function (data) { d.resolve(data); }).error(function (data) { d.reject(data); });
       return d.promise;
   }
-  service.getrecentlist = function () {
-      var d = $q.defer();
-      $http.get(config.url + '?action="recentlist"', "", { headers: { 'Content-Type': 'application/json' } }).success(function (data) { d.resolve(data); }).error(function (data) { d.reject(data); });
+  service.getrecentlist = function (p) {
+      var d = $q.defer();      
+      var param = "";
+      if (p) { p.action = "filterlist"; }else if (!p) { p = {}; p.action = "recentlist"; }
+      param = "?action=" + JSON.stringify(p);
+      $http.get(config.url+param,"", { headers: { 'Content-Type': 'application/json' } }).success(function (data) { d.resolve(data); }).error(function (data) { d.reject(data); });
       return d.promise;
   }
   return service;
@@ -224,6 +228,7 @@ app.controller('MainCtrl', function ($scope, localStorageService, $location, $ro
   $scope.init=function(){
     data = DataService;
     data.init();
+    $scope.Filter = {};
 
     $scope.$watch('[Item.Environment]', function (values) {
         if (values && values[0]) {
@@ -233,6 +238,15 @@ app.controller('MainCtrl', function ($scope, localStorageService, $location, $ro
         }
     });
 
+    $scope.$watch('[Filter.Customer,Filter.Environment,Filter.ReleaseType,Filter.BuildDate]', function (values) {
+        $scope.FilterReleases();
+    });
+    $scope.FilterReleases = function () {
+        var p = { Customer: $scope.Filter.Customer, Environment: $scope.Filter.Environment, ReleaseType: $scope.Filter.ReleaseType, BuildDate: $scope.Filter.BuildDate };
+        data.getrecentlist(p).then(function (list) {
+            $scope.FilterList = list;
+        });
+    }
     $scope.Item={};
     $('.datetimepicker').datetimepicker({format: datetimeformat});
     

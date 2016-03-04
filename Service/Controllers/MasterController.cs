@@ -1,4 +1,5 @@
-﻿using Service.Models;
+﻿using Newtonsoft.Json;
+using Service.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,8 +23,26 @@ namespace Service.Controllers
         [HttpGet]
         public IHttpActionResult GetMasters(string action)
         {
-            var releases = db.GetRecentReleases();
-            return Json(releases);
+            if (string.IsNullOrEmpty(action) == false)
+            {
+                var param = JsonConvert.DeserializeObject<paramproperty>(action);
+
+                if(param.action== "filterlist")
+                {
+                    var releases = db.GetRecentReleases(param);
+                    return Json(releases);
+                }
+                else
+                {
+                    var releases = db.GetRecentReleases();
+                    return Json(releases);
+                }
+            }
+            else
+            {
+                var releases = db.GetRecentReleases();
+                return Json(releases);
+            }
         }
 
         [HttpPost]

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Text;
 using System.Web;
 
 namespace Service.Models
@@ -33,25 +34,39 @@ namespace Service.Models
             return master;
         }
 
-        public List<ReleaseItem> GetRecentReleases()
+        public List<ReleaseItem> GetRecentReleases(paramproperty param=null)
         {
             int count = 10;
-            var releases = this.ReleaseItems.OrderByDescending(o => o.Id).Take(count).ToList();
+            //var releases = this.ReleaseItems.OrderByDescending(o => o.Id).Take(count).ToList();
 
-            //var releases = (from a in ReleaseItems
-            //                  join b in Customers on a.Customer equals b.Id
-            //                  orderby a.Id descending
-            //                  select new ReleaseItem
-            //                  {
-            //                       CustomerName = a.CustomerName,
-            //                       Customer=a.Customer,
-            //                       Version = a.Version,
-            //                       BuildDate = a.BuildDate,
-            //                       BuildNumber=a.BuildNumber,
-            //                       Environment = a.Environment,
-            //                       ReleaseType = a.ReleaseType,
+            var sql = new StringBuilder();
 
-            //                  }).Take(count).ToList();
+            sql.AppendFormat(@" SELECT top {0} a.[Id] ,[Customer],[Version],[BuildDate],[BuildNumber],[Environment]
+                              ,[ReleaseType],[CloudURL],[DNSURL],[MobileURL],[DBServer],[DBName],[Modules]
+                              ,[Location],[Subscription],[Hostname],[VMSize],[SharedInstance],[NumberOfInstances]
+                              ,b.name [CustomerName],c.Name [ReleaseTypeName],d.Name [EnvironmentName],e.Name [LocationName],f.Name [SubscriptionName]
+                          FROM [dbo].[ReleaseItems] a
+                          Inner Join Customers b on b.Id=a.Customer
+                          left outer join ReleaseTypes c on c.Id =a.ReleaseType
+                          left outer join Environments d on d.Id =a.Environment
+                          left outer join Locations e on e.Id = a.Location
+                          left outer join Subscriptions f on f.Id = a.Subscription where 1=1
+                        ",count);
+
+            if (param != null)
+            {
+                if (param.Customer > 0)
+                    sql.AppendFormat(" and a.Customer={0} ", param.Customer);
+                if (param.Environment > 0)
+                    sql.AppendFormat(" and a.Environment={0} ", param.Environment);
+                if (param.ReleaseType> 0)
+                    sql.AppendFormat(" and a.ReleaseType={0} ", param.ReleaseType);
+                if (string.IsNullOrEmpty(param.BuildDate) == false)
+                    sql.AppendFormat(" and a.BuildDate='{0}'",param.BuildDate);
+
+            }
+
+            var releases = ReleaseItems.SqlQuery(sql.ToString()).ToList<ReleaseItem>();
 
             return releases;
         }

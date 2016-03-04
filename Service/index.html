@@ -84,31 +84,60 @@
                 
           </div>
         <div class="row">
-            <div class="pull-left col-md-4">
-                <h3>Recent Releases</h3>
+            <div class="pull-left col-md-12">
+                <h3>Recent Releases <small><a href="#/list">Show all releases</a></small></h3>
             </div>            
         </div>
-          <table class="table table-striped">
-              <tr>
-                  <th>#</th>
-                  <th>Customer</th>
-                  <th>Version</th>
-                  <th>Build Number</th>
-                  <th>Build Date</th>
-              </tr>
-             <tr ng-repeat="row in RecentList track by $index" ng-click="edit($index,row)">
-                  <td ng-bind="$index+1"></td>
-                  <td ng-bind="row.CustomerName"></td>
-                  <td ng-bind="row.Version"></td>
-                  <td ng-bind="row.BuildNumber"></td>
-                  <td ng-bind="row.BuildDate"></td>
-              </tr>
-               <tr ng-show="!RecentList || RecentList.length==0">
-                        <td colspan="8"><center>No releases yet. <a href="#/add">Create One</a></center> </td>
-                    </tr>
-            </table>
+        <ul class="list-group">
+            <li class="list-group-item" ng-repeat="row in RecentList track by $index" ng-click="edit($index,row)">
+                    <h4>{{row.CustomerName}} <small ng-bind="row.Version"></small></h4>
+                    <ul class="breadcrumb">
+                        <li><small>Build Date:</small> {{row.BuildDate}}</li>
+                        <li><small>Build Number:</small> {{row.BuildNumber}}</li>
+                        <li><small>Release Type:</small> {{row.ReleaseTypeName}}</li>
+                        <li><small>Environment:</small> {{row.EnvironmentName}}</li>
+                        <li><small>Location:</small> {{row.LocationName}}</li>
+                        <li><small>Subscription:</small> {{row.SubscriptionName}}</li>
+                    </ul>
+            </li>
+        </ul>
       </script>
-      
+      <script id="releaselist.html" type="text/ng-template">
+          <div class="row">
+                <div class="row form-group col-md-3">
+                    <label class="control-label" for="inputDefault">Customer</label>
+                    <select name="mySelect" id="mySelect" class="form-control" ng-options="value.Id as value.Name for value in Customers" ng-model="Filter.Customer"></select>
+                </div>
+                <div class="form-group col-md-3">
+                    <label class="control-label" for="inputDefault">Environment</label>
+                    <select name="mySelect" id="mySelect" class="form-control" ng-options="value.Id as value.Name for value in Environments" ng-model="Filter.Environment"></select>
+                </div>
+              <div class="form-group col-md-3">
+                  <label class="control-label" for="inputDefault">Release Type</label>
+                  <select name="mySelect" id="mySelect" class="form-control" ng-options="value.Id as value.Name for value in ReleaseTypes" ng-model="Filter.ReleaseType"></select>
+              </div>
+              <div class="form-group col-md-3">
+                  <label class="control-label" for="inputDefault">Build Date</label>
+                  <input data-ng-model="Filter.BuildDate" type="text" datetime-picker="Filter.BuildDate" class="form-control" placeholder="dd/mm/yyyy" />
+              </div>
+              <table class="table table-striped">
+                  <tr>
+                      <th>Customer</th>
+                      <th>Build No</th>
+                      <th>Build Date</th>
+                      <th>Release Type</th>
+                      <th>Environment</th>
+                  </tr>
+                  <tr ng-repeat="row in FilterList track by $index">
+                      <td>{{row.CustomerName}}</td>
+                      <td>{{row.BuildNumber}}</td>
+                      <td>{{row.BuildDate}}</td>
+                      <td>{{row.ReleaseTypeName}}</td>
+                      <td>{{row.EnvironmentName}}</td>
+                  </tr>
+              </table>
+          </div>
+      </script>
     <script id="addexpense.html" type="text/ng-template">
       <div class="row">
         <div class="col-md-3">        

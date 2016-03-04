@@ -5,6 +5,15 @@ using System.Web;
 
 namespace Service.Models
 {
+    public class paramproperty
+    {
+        public string action { get; set; }
+        public int Customer { get; set; }
+        public int Environment { get; set; }
+        public int ReleaseType { get; set; }
+        public string BuildDate { get; set; }
+    }
+
     public class Masters
     {
         public List<Customer> Customers { get; set; }
@@ -19,6 +28,7 @@ namespace Service.Models
         public int Id { get; set; }
         public string Name { get; set; }
         
+        public bool Active { get; set; }
     }
 
     public class Environment
