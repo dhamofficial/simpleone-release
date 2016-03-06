@@ -7,6 +7,7 @@ namespace Service.Models
 {
     public class paramproperty
     {
+        public int Id { get; set; }
         public string action { get; set; }
         public int Customer { get; set; }
         public int Environment { get; set; }

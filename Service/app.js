@@ -1,6 +1,8 @@
-var app = angular.module('myapp', ['LocalStorageModule','ngSanitize','ngRoute','ngAnimate','angular-growl','ngTagsInput']);
-app.config(function (localStorageServiceProvider,$routeProvider) {
-  localStorageServiceProvider.setPrefix('releasemgmt');
+var app = angular.module('myapp', ['LocalStorageModule', 'ngSanitize', 'ngRoute', 'ngAnimate', 'angular-growl', 'ngTagsInput', 'angular-loading-bar']);
+app.config(function (localStorageServiceProvider, $routeProvider, cfpLoadingBarProvider) {
+    localStorageServiceProvider.setPrefix('releasemgmt');
+    cfpLoadingBarProvider.includeSpinner = true;
+    cfpLoadingBarProvider.includeBar = true;
   
   $routeProvider
     .when('/', {templateUrl : 'dashboard.html',controller  : 'MainCtrl'})
@@ -24,7 +26,9 @@ app.directive('monthControl', function() {
         var modelName = attrs['datetimePicker'];
         $(element).datetimepicker({format: datetimeformat});
               $(element).blur(function(){scope.$apply(function(){
-                var sv='if(scope.'+modelName+')scope.'+modelName+'="'+$(element).val()+'";';
+                  var sv = 'scope.' + modelName + '="' + $(element).val() + '";';
+                  //console.log('selected date:', $(element).val());
+                  //console.log(sv);
                   eval(sv);
                   });});
     };
@@ -212,7 +216,7 @@ app.factory('DataService',function($q,$http){
   }
   return service;
 });
-app.controller('MainCtrl', function ($scope, localStorageService, $location, $routeParams, growl, DataService, $q, $filter) {
+app.controller('MainCtrl', function ($scope, localStorageService, $location, $routeParams, growl, DataService, $q, $filter,$timeout) {
   var remotedb=true;
   $scope.Items=[];
   var key='release_tracker';
@@ -231,23 +235,29 @@ app.controller('MainCtrl', function ($scope, localStorageService, $location, $ro
     $scope.Filter = {};
 
     $scope.$watch('[Item.Environment]', function (values) {
-        if (values && values[0]) {
-            var myRedObjects = $filter('filter')($scope.Environments, { Id: values[0] })[0];
+        if (values && values.length > 0 && values[0]) {
+            var obj = $filter('filter')($scope.Environments, { Id: values[0] });
+            if (obj && obj.length > 0) {
+                var myRedObjects = $filter('filter')($scope.Environments, { Id: values[0] })[0];
+                if (myRedObjects.Name == 'Cloud') $scope.visibility1 = true; else $scope.visibility1 = false;
+            }
             //console.log('watcher:', myRedObjects.Name,values[0], $scope.Environments[values[0] - 1]);
-            if (myRedObjects.Name == 'Cloud') $scope.visibility1 = true; else $scope.visibility1 = false;
         }
     });
 
     $scope.$watch('[Filter.Customer,Filter.Environment,Filter.ReleaseType,Filter.BuildDate]', function (values) {
         $scope.FilterReleases();
     });
+    $scope.new = function () {
+        $scope.Item = { Customer: 1, Environment: 1, Location: 1, Subscription:1,Environment: 1, ReleaseType: 1 };
+    }
     $scope.FilterReleases = function () {
         var p = { Customer: $scope.Filter.Customer, Environment: $scope.Filter.Environment, ReleaseType: $scope.Filter.ReleaseType, BuildDate: $scope.Filter.BuildDate };
         data.getrecentlist(p).then(function (list) {
             $scope.FilterList = list;
         });
     }
-    $scope.Item={};
+    //$scope.Item={};
     $('.datetimepicker').datetimepicker({format: datetimeformat});
     
     $scope.months=moment.monthsShort();
@@ -257,10 +267,13 @@ app.controller('MainCtrl', function ($scope, localStorageService, $location, $ro
     if(v && v!='')$scope.Items=JSON.parse(v);
     $scope.newmode = true;
     
-    if($routeParams.ind){
+    if ($routeParams.ind) {
+        console.log('edit mode');
       $scope.newmode=false;
       $scope.loadData($routeParams.ind);
     } else {
+        console.log('new mode');
+        $scope.new();
         data.getdata().then(function (d) {
             $scope.Customers = d.Customers;
             $scope.ReleaseTypes = d.ReleaseTypes;
@@ -275,6 +288,18 @@ app.controller('MainCtrl', function ($scope, localStorageService, $location, $ro
   }
   $scope.init();
   
+  $scope.edit = function (id) {
+      $location.path('/add/' + id);
+  }
+  $scope.loadData = function (id) {
+      var p = { Id: id };
+      //$timeout(function () {
+      data.getrecentlist(p).then(function (d) {
+          $scope.Item = d;
+          //console.log('edi item:',$scope.Item);
+      });
+      //}, 1000);
+  }
   $scope.savetodb = function (t) {
       var d = $q.defer();
       if (!remotedb) {
@@ -297,19 +322,14 @@ app.controller('MainCtrl', function ($scope, localStorageService, $location, $ro
     return d.promise;
   }
   
-  $scope.edit=function(index){
-    $location.path('/add/'+index);
-  }
-  $scope.loadData = function (index) {
-      console.log($scope.RecentList);
-    $scope.selectedIndex = index;
-    $scope.Item=$scope.RecentList[index];
-  }
+  
   $scope.saveTrans=function(t){
-    //if(t.due && t.due!='')t.due=moment(t.due).format(datetimeformat);
-       
+      //if(t.due && t.due!='')t.due=moment(t.due).format(datetimeformat);
+      //console.log('saveobject:',t);
+      $scope.saving = true;
       $scope.savetodb(t).then(function (data) {
           growl.success("Great, Release information saved");
+          $scope.saving = false;
           $scope.cancel();
       }, function (reason) {
           growl.error(reason, { title: 'Oh no, Something went wrong! :-)' });

@@ -16,6 +16,27 @@ namespace Service.Migrations
         {
             //  This method will be called after migrating to the latest version.
 
+
+            context.Customers.AddOrUpdate(p=>p.Name,
+                new Models.Customer { Name="All" , Active=true}
+            );
+
+            context.Environments.AddOrUpdate(p => p.Name,
+                new Models.Environment { Name = "All" }
+            );
+
+            context.Locations.AddOrUpdate(p => p.Name,
+                new Models.Location { Name = "All" }
+            );
+
+            context.ReleaseTypes.AddOrUpdate(p => p.Name,
+                new Models.ReleaseType { Name = "All" }
+            );
+
+            context.Subscriptions.AddOrUpdate(p => p.Name,
+                new Models.Subscription { Name = "All" }
+            );
+
             //  You can use the DbSet<T>.AddOrUpdate() helper extension method 
             //  to avoid creating duplicate seed data. E.g.
             //

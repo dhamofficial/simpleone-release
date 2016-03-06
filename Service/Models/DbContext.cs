@@ -31,6 +31,12 @@ namespace Service.Models
             master.ReleaseTypes = ReleaseTypes.ToList();
             master.Subscriptions = Subscriptions.ToList();
 
+            //master.Customers.Insert(0,new Customer { Name="All" });
+            //master.Environments.Insert(0,new Environment { Name="All" });
+            //master.Locations.Insert(0,new Location { Name="All" });
+            //master.ReleaseTypes.Insert(0,new ReleaseType { Name= "All" });
+            //master.Subscriptions.Insert(0,new Subscription { Name= "All" });
+
             return master;
         }
 
@@ -44,9 +50,9 @@ namespace Service.Models
             sql.AppendFormat(@" SELECT top {0} a.[Id] ,[Customer],[Version],[BuildDate],[BuildNumber],[Environment]
                               ,[ReleaseType],[CloudURL],[DNSURL],[MobileURL],[DBServer],[DBName],[Modules]
                               ,[Location],[Subscription],[Hostname],[VMSize],[SharedInstance],[NumberOfInstances]
-                              ,b.name [CustomerName],c.Name [ReleaseTypeName],d.Name [EnvironmentName],e.Name [LocationName],f.Name [SubscriptionName]
+                              ,ISNULL(b.name,'All') [CustomerName],c.Name [ReleaseTypeName],d.Name [EnvironmentName],e.Name [LocationName],f.Name [SubscriptionName]
                           FROM [dbo].[ReleaseItems] a
-                          Inner Join Customers b on b.Id=a.Customer
+                          left outer Join Customers b on b.Id=a.Customer
                           left outer join ReleaseTypes c on c.Id =a.ReleaseType
                           left outer join Environments d on d.Id =a.Environment
                           left outer join Locations e on e.Id = a.Location
@@ -55,6 +61,8 @@ namespace Service.Models
 
             if (param != null)
             {
+                if (param.Id > 0)
+                    sql.AppendFormat(" and a.Id={0} ", param.Id);
                 if (param.Customer > 0)
                     sql.AppendFormat(" and a.Customer={0} ", param.Customer);
                 if (param.Environment > 0)

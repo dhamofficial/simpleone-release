@@ -228,7 +228,11 @@
     <Content Include="Global.asax" />
     <Content Include="index.html" />
     <Content Include="jquery.min.js" />
+    <Content Include="loading-bar.min.css" />
+    <Content Include="loading-bar.min.js" />
     <Content Include="moment.js" />
+    <Content Include="ng-tags-input.min.css" />
+    <Content Include="ng-tags-input.min.js" />
     <Content Include="Scripts\ai.0.15.0-build58334.js" />
     <Content Include="Scripts\ai.0.15.0-build58334.min.js" />
     <Content Include="Scripts\bootstrap.js" />

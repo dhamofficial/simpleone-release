@@ -2,6 +2,7 @@
 using Service.Models;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -30,7 +31,11 @@ namespace Service.Controllers
                 if(param.action== "filterlist")
                 {
                     var releases = db.GetRecentReleases(param);
-                    return Json(releases);
+
+                    if (param.Id > 0 && releases.Count>0)
+                        return Json(releases[0]);
+                    else
+                        return Json(releases);
                 }
                 else
                 {
@@ -48,21 +53,31 @@ namespace Service.Controllers
         [HttpPost]
         public IHttpActionResult PostItem(ReleaseItem item)
         {
-            if (!ModelState.IsValid)
+            //if (!ModelState.IsValid)
+            //{
+            //    return BadRequest(ModelState);
+            //}
+
+            if (true)//item.Customer > 0)
             {
-                return BadRequest(ModelState);
-            }
-            if (item.Customer > 0)
-            {
-                db.ReleaseItems.Add(item);
-                db.SaveChanges();
+                if (item.Id == 0)
+                {
+                    db.ReleaseItems.Add(item);
+                    db.SaveChanges();
+                }
+                else
+                {
+                    db.ReleaseItems.Attach(item);
+                    db.Entry(item).State = EntityState.Modified;
+                    db.SaveChanges();
+                }
 
                 return Ok(new { Action = "Success" });
             }
-            else
-            {
-                return BadRequest("Invalid Parameters/Insufficient Parameters");
-            }
+            //else
+            //{
+            //    return BadRequest("Invalid Parameters/Insufficient Parameters");
+            //}
         }
     }
 }
