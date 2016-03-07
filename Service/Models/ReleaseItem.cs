@@ -55,7 +55,7 @@ namespace Service.Models
             set { if (value != null) mobileurlcol = new List<tagitem>(value.Split(',').Select(s => new tagitem { text = s })); }
         }
         [System.ComponentModel.DataAnnotations.Schema.NotMapped]
-        public List<tagitem> mobileurlcol { get; set; }
+        public List<tagitem> mobileurlcol { get; set; } 
 
         public string Modules
         {
