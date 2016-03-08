@@ -1,0 +1,54 @@
+﻿@{
+    Layout = null;
+}
+<div>
+    <div class="page-header">
+        <h3 ng-bind="Title"></h3>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label class="control-label" for="focusedInput">Module</label>
+                    <select multiple="" class="form-control" size="10">
+                        <option>Incident</option>
+                        <option>Service Request</option>
+                        <option>Request Fulfilment</option>
+                        <option>Service Catalog</option>
+                        <option>Problem</option>
+                        <option>Work Order</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="focusedInput">Category</label>
+                    <select class="form-control">
+                        <option>Development</option>
+                        <option>Customization</option>
+                        <option>Bug Fix</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="control-label" for="focusedInput">Feature Title</label>
+                            <input type="text" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label" for="focusedInput">Description</label>
+                            <textarea class="form-control"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-lg-10 col-lg-offset-2">
+                            <button type="reset" class="btn btn-default">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
