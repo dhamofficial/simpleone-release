@@ -8,6 +8,7 @@ namespace Service.Models
     public class ReleaseItem
     {
         public int Id { get; set; }
+        public string Status { get; set; }
         public int Customer { get; set; }
         public string Version { get; set; }
         public string BuildDate { get; set; }
@@ -21,6 +22,8 @@ namespace Service.Models
         public string Hostname { get; set; }
         public bool SharedInstance { get; set; }
         public int NumberOfInstances { get; set; }
+        public DateTime? ReleaseDate { get; set; }
+        public DateTime? LicenseExpiryDate { get; set; }
 
         //[System.ComponentModel.DataAnnotations.Schema.NotMapped]
         public string CustomerName { get; set; }

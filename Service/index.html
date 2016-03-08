@@ -58,33 +58,32 @@
       <div ng-view=""></div>
     </div>
     <script id="dashboard.html" type="text/ng-template">
-          <div class="row">
-              <div class="col-sm-3 col-xs-3 col-md-3">
-                <div class="tile blue">
-                  <h3 class="title">THIS WEEK </h3>
-                  <h5>5 DONE / 3 PENDING</h5>
-                </div>
-              </div>
-               <div class="col-sm-3 col-xs-3 col-md-3">
-                <div class="tile red">
-                  <h3 class="title">THIS MONTH </h3>
-                  <h5>6 RELEASED / 3 PENDING</h5>
-                </div>
-              </div>
-               <div class="col-sm-3 col-xs-3 col-md-3">
-                <div class="tile purple">
-                  <h3 class="title">NEXT MONTH </h3>
-                  <h5>3 NEW RELEASES</h5>
-                </div>
-              </div>
-               <div class="col-sm-3 col-xs-3 col-md-3">
-                <div class="tile green">
-                  <h3 class="title">OLD RELEASES </h3>
-                  <h5>25</h5>
-                </div>
-              </div>
-                
-          </div>
+        <div class="row">
+            <div class="col-sm-3 col-xs-3 col-md-3">
+            <div class="tile blue" ng-click="showlist('thisweek')">
+                <h3 class="title">THIS WEEK </h3>
+                <h5 ng-bind="tiledata.thisweek"></h5>
+            </div>
+            </div>
+            <div class="col-sm-3 col-xs-3 col-md-3">
+            <div class="tile red" ng-click="showlist('thismonth')">
+                <h3 class="title">THIS MONTH </h3>
+                <h5 ng-bind="tiledata.thismonth"></h5>
+            </div>
+            </div>
+            <div class="col-sm-3 col-xs-3 col-md-3">
+            <div class="tile purple" ng-click="showlist('nextmonth')">
+                <h3 class="title">NEXT MONTH </h3>
+                <h5 ng-bind="tiledata.nextmonth"></h5>
+            </div>
+            </div>
+            <div class="col-sm-3 col-xs-3 col-md-3">
+            <div class="tile green" ng-click="showlist('oldrelease')">
+                <h3 class="title">OLD RELEASES </h3>
+                <h5 ng-bind="tiledata.oldreleases"></h5>
+            </div>
+            </div>
+        </div>
         <div class="row" ng-if="RecentList && RecentList.length>0">
             <div class="pull-left col-md-12">
                 <h3>Recent Releases <small><a href="#/list">Show all releases</a></small></h3>
@@ -94,11 +93,13 @@
             <li class="list-group-item" ng-repeat="row in RecentList track by $index" ng-click="edit(row.Id)">
                 <h4>{{row.CustomerName}} <small ng-bind="row.Version"></small></h4>
                 <ul class="breadcrumb">
-                    <li><small>Build Date: <span ng-bind="row.BuildDate"></span></small></li>
+                    <li><small>Build Date: <span ng-bind="row.BuildDate | date:datetimeformat"></span></small></li>
                     <li><small>Build Number: <span ng-bind="row.BuildNumber"></span></small></li>
                     <li><small>Release Type: <span ng-bind="row.ReleaseTypeName"></span></small></li>
                     <li><small>Environment: <span ng-bind="row.EnvironmentName"></span></small></li>
                     <li><small>Location: <span ng-bind="row.LocationName"></span></small></li>
+                    <li><small>Release: <span ng-bind="row.ReleaseDate | date:datetimeformat"></span></small></li>
+                    <li><small>Status: <span ng-bind="row.Status"></span></small></li>
                 </ul>
             </li>
         </ul>
@@ -160,11 +161,22 @@
             </div>
             <div class="form-group col-md-12 col-xs-6">
                 <label class="control-label" for="inputSmall">Build Date</label>
-                <input data-ng-model="Item.BuildDate" type="text" datetime-picker="Item.BuildDate" class="form-control" placeholder="dd/mm/yyyy"/>
+                <input data-ng-model="Item.BuildDate" type="text" datetime-picker="Item.BuildDate" class="form-control" placeholder=""/>
             </div>
             <div class="form-group col-md-12 col-xs-6">
                 <label class="control-label" for="inputSmall">Build Number</label>
                 <input class="form-control" type="text" ng-model="Item.BuildNumber" />
+            </div>
+            <div class="form-group col-md-12 col-xs-6">
+                <label class="control-label" for="inputSmall">Release Date</label>
+                <input data-ng-model="Item.ReleaseDate" type="text" datetime-picker="Item.ReleaseDate" class="form-control" placeholder="" />
+            </div>
+            <div class="form-group col-md-12 col-xs-6">
+                <label class="control-label" for="inputLarge">Release Type *</label>
+                <select name="mySelect" id="mySelect" class="form-control" ng-model="Item.Status">
+                    <option>Planned</option>
+                    <option>Released</option>
+                </select>
             </div>
             <div class="form-group col-md-12 col-xs-6">
                 <label class="control-label" for="inputLarge">Environment</label>
@@ -175,9 +187,9 @@
                 <select name="mySelect" id="mySelect" class="form-control" ng-options="value.Id as value.Name for value in ReleaseTypes" ng-model="Item.ReleaseType"></select>         
                 <!--<select name="mySelect" id="mySelect" class="form-control" ng-options="option.Name for option in ReleaseTypes track by option.Id" ng-model="Item.ReleaseType"></select>-->         
             </div>
-            <div class="form-group hide">
-                <label class="control-label" for="inputLarge">License Expiry Date</label>
-                <input data-ng-model="Item.LicenseExpiryDate" type="text" datetime-picker="Item.LicenseExpiryDate" class="form-control" placeholder="dd/mm/yyyy"/>
+            <div class="form-group col-md-12 col-xs-6">
+                <label class="control-label" for="inputSmall">License Expiry Date</label>
+                <input data-ng-model="Item.LicenseExpiryDate" type="text" datetime-picker="Item.LicenseExpiryDate" class="form-control" placeholder="" />
             </div>
         </div>
         <div class="col-md-3">
@@ -228,11 +240,11 @@
             <div class="form-group col-md-12 col-xs-6" ng-show="visibility1">
                 <label class="control-label" for="inputLarge">Shared Instance</label>
                 <select class="form-control" ng-model="Item.SharedInstance">
-                    <option>Yes</option>
-                    <option>No</option>
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
                 </select>
             </div>
-            <div class="form-group col-md-12 col-xs-6" ng-show="visibility1 && Item.SharedInstance=='Yes'">
+            <div class="form-group col-md-12 col-xs-6" ng-show="visibility1 && Item.SharedInstance=='true'">
                 <label class="control-label" for="inputLarge">Number of instances</label>
                 <select class="form-control" ng-model="Item.NumberOfInstances">
                     <option value=""></option>

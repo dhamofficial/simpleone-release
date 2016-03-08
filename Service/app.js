@@ -7,6 +7,7 @@ app.config(function (localStorageServiceProvider, $routeProvider, cfpLoadingBarP
   $routeProvider
     .when('/', {templateUrl : 'dashboard.html',controller  : 'MainCtrl'})
     .when('/list', { templateUrl: 'releaselist.html', controller: 'MainCtrl' })
+    .when('/list/:flag', { templateUrl: 'releaselist.html', controller: 'MainCtrl' })
     .when('/add', { templateUrl: 'addexpense.html', controller: 'MainCtrl' })
     .when('/add/:ind',{controller: 'MainCtrl',templateUrl: 'addexpense.html'});
 
@@ -186,8 +187,8 @@ app.factory('DataService',function($q,$http){
   var service={};
   var config={};
   service.init=function(p){
+    config.url='/release/api/master';
     if(p)config=p;
-    config.url='/Service/api/master';
   }
   service.getdata=function(){
     var d = $q.defer();
@@ -216,8 +217,10 @@ app.factory('DataService',function($q,$http){
   }
   return service;
 });
-app.controller('MainCtrl', function ($scope, localStorageService, $location, $routeParams, growl, DataService, $q, $filter,$timeout) {
-  var remotedb=true;
+app.controller('MainCtrl', function ($scope, localStorageService, $location, $route, $routeParams, growl, DataService, $q, $filter, $timeout) {
+    var pagename = '';
+    if ($route.current && $route.current.loadedTemplateUrl) pagename= $route.current.loadedTemplateUrl;
+    var remotedb = true;
   $scope.Items=[];
   var key='release_tracker';
   var datetimeformat='YYYY-MM-DD HH:mm:ss';
@@ -229,9 +232,9 @@ app.controller('MainCtrl', function ($scope, localStorageService, $location, $ro
   $scope.changeMonth=function(index){
     $scope.currentMonth=$scope.months[index];
   }
-  $scope.init=function(){
+  $scope.init = function (settings) {
     data = DataService;
-    data.init();
+    data.init(settings);
     $scope.Filter = {};
 
     $scope.$watch('[Item.Environment]', function (values) {
@@ -244,19 +247,24 @@ app.controller('MainCtrl', function ($scope, localStorageService, $location, $ro
             //console.log('watcher:', myRedObjects.Name,values[0], $scope.Environments[values[0] - 1]);
         }
     });
-
-    $scope.$watch('[Filter.Customer,Filter.Environment,Filter.ReleaseType,Filter.BuildDate]', function (values) {
-        $scope.FilterReleases();
-    });
-    $scope.new = function () {
-        $scope.Item = { Customer: 1, Environment: 1, Location: 1, Subscription:1,Environment: 1, ReleaseType: 1 };
-    }
-    $scope.FilterReleases = function () {
-        var p = { Customer: $scope.Filter.Customer, Environment: $scope.Filter.Environment, ReleaseType: $scope.Filter.ReleaseType, BuildDate: $scope.Filter.BuildDate };
-        data.getrecentlist(p).then(function (list) {
-            $scope.FilterList = list;
+    if (pagename == 'releaselist.html') {
+        $scope.$watch('[Filter.Customer,Filter.Environment,Filter.ReleaseType,Filter.BuildDate]', function (values) {
+            $scope.FilterReleases();
         });
+        $scope.FilterReleases = function () {
+            var p = { Customer: $scope.Filter.Customer, Environment: $scope.Filter.Environment, ReleaseType: $scope.Filter.ReleaseType, BuildDate: $scope.Filter.BuildDate };
+            if ($routeParams.flag) {
+                p.flag = $routeParams.flag;
+            }
+            data.getrecentlist(p).then(function (list) {
+                $scope.FilterList = list;
+            });
+        }
     }
+    $scope.new = function () {
+        $scope.Item = { Customer: 0, Environment: 0, Location: 0, Subscription:0,Environment: 0, ReleaseType: 0 };
+    }
+    
     //$scope.Item={};
     $('.datetimepicker').datetimepicker({format: datetimeformat});
     
@@ -267,6 +275,7 @@ app.controller('MainCtrl', function ($scope, localStorageService, $location, $ro
     if(v && v!='')$scope.Items=JSON.parse(v);
     $scope.newmode = true;
     
+
     if ($routeParams.ind) {
         console.log('edit mode');
       $scope.newmode=false;
@@ -274,6 +283,7 @@ app.controller('MainCtrl', function ($scope, localStorageService, $location, $ro
     } else {
         console.log('new mode');
         $scope.new();
+        
         data.getdata().then(function (d) {
             $scope.Customers = d.Customers;
             $scope.ReleaseTypes = d.ReleaseTypes;
@@ -281,13 +291,17 @@ app.controller('MainCtrl', function ($scope, localStorageService, $location, $ro
             $scope.Locations = d.Locations;
             $scope.Subscriptions = d.Subscriptions;
         });
-        data.getrecentlist().then(function (recentlist) {
-            $scope.RecentList = recentlist;
+        data.getrecentlist().then(function (r) {
+            $scope.RecentList = r.recentitems;
+            $scope.tiledata = r.tiledata;
         });
     }
   }
+
   $scope.init();
-  
+  $scope.showlist = function (flag) {
+      $location.path('/list/' + flag);
+  }
   $scope.edit = function (id) {
       $location.path('/add/' + id);
   }
@@ -296,6 +310,7 @@ app.controller('MainCtrl', function ($scope, localStorageService, $location, $ro
       //$timeout(function () {
       data.getrecentlist(p).then(function (d) {
           $scope.Item = d;
+          if (d.SharedInstance) $scope.Item.SharedInstance = 'true'; else $scope.Item.SharedInstance = 'false';
           //console.log('edi item:',$scope.Item);
       });
       //}, 1000);

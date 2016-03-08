@@ -40,7 +40,21 @@ namespace Service.Controllers
                 else
                 {
                     var releases = db.GetRecentReleases();
-                    return Json(releases);
+
+                    var list = db.GetAll();
+
+                    var dashboard = new {
+                        tiledata =new {
+                            thisweek ="5 DONE / 10 PENDING",
+                            thismonth = "12 DONE / 20 PENDING",
+                            nextmonth = "40 RELEASES",
+                            oldreleases = "100 RELEASES"
+                        },
+                        recentitems=releases
+                    };
+                 
+
+                    return Json(dashboard);
                 }
             }
             else

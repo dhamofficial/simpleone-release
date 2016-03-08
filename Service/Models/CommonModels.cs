@@ -13,6 +13,7 @@ namespace Service.Models
         public int Environment { get; set; }
         public int ReleaseType { get; set; }
         public string BuildDate { get; set; }
+        public string flag { get; set; }
     }
 
     public class Masters

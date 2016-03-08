@@ -31,16 +31,22 @@ namespace Service.Models
             master.ReleaseTypes = ReleaseTypes.ToList();
             master.Subscriptions = Subscriptions.ToList();
 
-            //master.Customers.Insert(0,new Customer { Name="All" });
-            //master.Environments.Insert(0,new Environment { Name="All" });
-            //master.Locations.Insert(0,new Location { Name="All" });
-            //master.ReleaseTypes.Insert(0,new ReleaseType { Name= "All" });
-            //master.Subscriptions.Insert(0,new Subscription { Name= "All" });
+            master.Customers.Insert(0, new Customer { Name = "All" });
+            master.Environments.Insert(0, new Environment { Name = "All" });
+            master.Locations.Insert(0, new Location { Name = "All" });
+            master.ReleaseTypes.Insert(0, new ReleaseType { Name = "All" });
+            master.Subscriptions.Insert(0, new Subscription { Name = "All" });
 
             return master;
         }
 
-        public List<ReleaseItem> GetRecentReleases(paramproperty param=null)
+        public List<ReleaseItem> GetAll()
+        {
+            var list = this.GetRecentReleases(getAll:true);
+            return list;
+        }
+
+        public List<ReleaseItem> GetRecentReleases(paramproperty param=null,bool getAll=false)
         {
             int count = 10;
             //var releases = this.ReleaseItems.OrderByDescending(o => o.Id).Take(count).ToList();
@@ -51,13 +57,14 @@ namespace Service.Models
                               ,[ReleaseType],[CloudURL],[DNSURL],[MobileURL],[DBServer],[DBName],[Modules]
                               ,[Location],[Subscription],[Hostname],[VMSize],[SharedInstance],[NumberOfInstances]
                               ,ISNULL(b.name,'All') [CustomerName],c.Name [ReleaseTypeName],d.Name [EnvironmentName],e.Name [LocationName],f.Name [SubscriptionName]
+                            ,a.ReleaseDate,a.LicenseExpiryDate,a.Status
                           FROM [dbo].[ReleaseItems] a
                           left outer Join Customers b on b.Id=a.Customer
                           left outer join ReleaseTypes c on c.Id =a.ReleaseType
                           left outer join Environments d on d.Id =a.Environment
                           left outer join Locations e on e.Id = a.Location
                           left outer join Subscriptions f on f.Id = a.Subscription where 1=1
-                        ",count);
+                        ", count);
 
             if (param != null)
             {
@@ -71,6 +78,18 @@ namespace Service.Models
                     sql.AppendFormat(" and a.ReleaseType={0} ", param.ReleaseType);
                 if (string.IsNullOrEmpty(param.BuildDate) == false)
                     sql.AppendFormat(" and a.BuildDate='{0}'",param.BuildDate);
+
+                if (param.flag == "thisweek")
+                    sql.Append(" and a.ReleaseDate >=dateadd(day, 1-datepart(dw, getdate()), CONVERT(date,getdate())) and a.ReleaseDate<=dateadd(day, 8-datepart(dw, getdate()), CONVERT(date,getdate()))  ");
+
+                else if (param.flag == "thismonth")
+                    sql.Append(" and datepart(month,a.ReleaseDate)=datepart(MONTH,getdate()) ");
+
+                else if (param.flag == "nextmonth")
+                    sql.Append(" and datepart(month,a.ReleaseDate)=datepart(MONTH,getdate())+1 ");
+
+                else if (param.flag == "oldrelease")
+                    sql.Append(" and datepart(month,a.ReleaseDate)<datepart(MONTH,getdate()) ");
 
             }
 
