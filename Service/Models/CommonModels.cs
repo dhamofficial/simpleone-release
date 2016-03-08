@@ -60,4 +60,12 @@ namespace Service.Models
         public string Name { get; set; }
 
     }
+
+    public class textvalueproperty
+    {
+        public string text { get; set; }
+        public string value { get; set; }
+        public string cssclass { get;set;}
+        public int sortorder { get; set; }
+    }
 }

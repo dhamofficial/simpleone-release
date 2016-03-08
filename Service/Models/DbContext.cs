@@ -40,9 +40,20 @@ namespace Service.Models
             return master;
         }
 
-        public List<ReleaseItem> GetAll()
+        public List<textvalueproperty> GetDashboardData()
         {
-            var list = this.GetRecentReleases(getAll:true);
+            var sql = new StringBuilder();
+            sql.Append(@"   select a.* from (select 'THIS WEEK' [text],'5 DONE / 10 PENDING' [value], 'blue' [cssclass], 1 [sortorder]
+                            union
+                            select 'THIS MONTH' [text],'12 DONE / 20 PENDING' [value], 'red' [cssclass], 2 [sortorder]
+                            union
+                            select 'NEXT MONTH' [text],'40 RELEASES' [value], 'purple' [cssclass], 3 [sortorder]
+                            union
+                            select 'OLD RELEASES' [text],'100 RELEASES' [value], 'green' [cssclass], 4 [sortorder]
+                    ) a order by a.sortorder
+                ");
+
+            var list = Database.SqlQuery<textvalueproperty>(sql.ToString()).ToList<textvalueproperty>();
             return list;
         }
 

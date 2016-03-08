@@ -81,91 +81,7 @@ app.service('ReleaseService', ['$q', function ($q) {
         }
         return d.promise;
     }
-    var getMasterData = function () {
-        var s = {
-  "Masters": {
-    "Customers": [
-      {
-        "text": "Dell",
-        "value": "1"
-      },
-      {
-        "text": "Hp",
-        "value": "2"
-      },
-      {
-        "text": "Lenovo",
-        "value": "3"
-      },
-      {
-        "text": "Compaq",
-        "value": "4"
-      }
-    ],
-    "Environments": [
-      {
-        "text": "On-Premise",
-        "value": "On-Premise"
-      },
-      {
-        "text": "Cloud",
-        "value": "Cloud"
-      }
-    ],
-    "ReleaseTypes": [
-      {
-        "text": "Production",
-        "value": "1"
-      },
-      {
-        "text": "Implementation",
-        "value": "2"
-      },
-      {
-        "text": "POC",
-        "value": "3"
-      },
-      {
-        "text": "Testing",
-        "value": "4"
-      }
-    ],
-    "Locations": [
-      {
-        "text": "India",
-        "value": "1"
-      },
-      {
-        "text": "US",
-        "value": "2"
-      },
-      {
-        "text": "Singapore",
-        "value": "3"
-      },
-      {
-        "text": "London",
-        "value": "4"
-      }
-    ],
-    "Subscriptions": [
-      {
-        "text": "South-Asia",
-        "value": "1"
-      },
-      {
-        "text": "West-Asia",
-        "value": "2"
-      },
-      {
-        "text": "East-Asia",
-        "value": "3"
-      }
-    ]
-  }
-};
-        return s.Masters;
-    }
+    
     var selectedItem;
     var selectedRow = function (o) {
         selectedItem = o;
@@ -178,7 +94,6 @@ app.service('ReleaseService', ['$q', function ($q) {
         add: addItem,
         get: getItems,
         update: updateItem,
-        master: getMasterData,
         selected: selectedRow,
         getSelected: getSelectedRow
     };

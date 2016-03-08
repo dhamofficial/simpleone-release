@@ -59,11 +59,19 @@
     </div>
     <script id="dashboard.html" type="text/ng-template">
         <div class="row">
-            <div class="col-sm-3 col-xs-3 col-md-3">
-            <div class="tile blue" ng-click="showlist('thisweek')">
-                <h3 class="title">THIS WEEK </h3>
-                <h5 ng-bind="tiledata.thisweek"></h5>
+            <div class="col-sm-3 col-xs-3 col-md-3" ng-repeat="tile in tiledata">
+                <div class="tile" ng-class="tile.cssclass" ng-click="showlist('thisweek')">
+                    <h3 class="title" ng-bind="tile.text"></h3>
+                    <h5 ng-bind="tile.value"></h5>
+                </div>
             </div>
+        </div>
+        <!--<div class="row">
+            <div class="col-sm-3 col-xs-3 col-md-3">
+                <div class="tile blue" ng-click="showlist('thisweek')">
+                    <h3 class="title">THIS WEEK </h3>
+                    <h5 ng-bind="tiledata.thisweek"></h5>
+                </div>
             </div>
             <div class="col-sm-3 col-xs-3 col-md-3">
             <div class="tile red" ng-click="showlist('thismonth')">
@@ -83,7 +91,7 @@
                 <h5 ng-bind="tiledata.oldreleases"></h5>
             </div>
             </div>
-        </div>
+        </div>-->
         <div class="row" ng-if="RecentList && RecentList.length>0">
             <div class="pull-left col-md-12">
                 <h3>Recent Releases <small><a href="#/list">Show all releases</a></small></h3>
