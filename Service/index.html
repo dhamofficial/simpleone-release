@@ -60,41 +60,15 @@
     <script id="dashboard.html" type="text/ng-template">
         <div class="row">
             <div class="col-sm-3 col-xs-3 col-md-3" ng-repeat="tile in tiledata">
-                <div class="tile" ng-class="tile.cssclass" ng-click="showlist('thisweek')">
+                <div class="tile" ng-class="tile.cssclass" ng-click="showlist(tile.flag)">
                     <h3 class="title" ng-bind="tile.text"></h3>
                     <h5 ng-bind="tile.value"></h5>
                 </div>
             </div>
         </div>
-        <!--<div class="row">
-            <div class="col-sm-3 col-xs-3 col-md-3">
-                <div class="tile blue" ng-click="showlist('thisweek')">
-                    <h3 class="title">THIS WEEK </h3>
-                    <h5 ng-bind="tiledata.thisweek"></h5>
-                </div>
-            </div>
-            <div class="col-sm-3 col-xs-3 col-md-3">
-            <div class="tile red" ng-click="showlist('thismonth')">
-                <h3 class="title">THIS MONTH </h3>
-                <h5 ng-bind="tiledata.thismonth"></h5>
-            </div>
-            </div>
-            <div class="col-sm-3 col-xs-3 col-md-3">
-            <div class="tile purple" ng-click="showlist('nextmonth')">
-                <h3 class="title">NEXT MONTH </h3>
-                <h5 ng-bind="tiledata.nextmonth"></h5>
-            </div>
-            </div>
-            <div class="col-sm-3 col-xs-3 col-md-3">
-            <div class="tile green" ng-click="showlist('oldrelease')">
-                <h3 class="title">OLD RELEASES </h3>
-                <h5 ng-bind="tiledata.oldreleases"></h5>
-            </div>
-            </div>
-        </div>-->
         <div class="row" ng-if="RecentList && RecentList.length>0">
             <div class="pull-left col-md-12">
-                <h3>Recent Releases <small><a href="#/list">Show all releases</a></small></h3>
+                <h3>Recent 5 Releases <small><a href="#/list">Show all releases</a></small></h3>
             </div>            
         </div>
         <ul class="list-group">
@@ -112,8 +86,8 @@
             </li>
         </ul>
       </script>
-      <script id="releaselist.html" type="text/ng-template">
-          <div class="row">
+    <script id="releaselist.html" type="text/ng-template">
+        <div class="row">
             <div class="col-md-3">
                 <div class="form-group col-md-12 col-xs-6">
                     <label class="control-label" for="inputDefault">Customer</label>
@@ -129,29 +103,46 @@
                 </div>
                 <div class="form-group col-md-12 col-xs-6">
                     <label class="control-label" for="inputDefault">Build Date</label>
-                    <input data-ng-model="Filter.BuildDate" type="text" datetime-picker="Filter.BuildDate" class="form-control" placeholder="dd/mm/yyyy" />
+                    <input data-ng-model="Filter.BuildDate" type="text" datetime-picker="Filter.BuildDate" class="form-control" />
+                </div>
+                <div class="form-group col-md-12 col-xs-6">
+                    <label class="control-label" for="inputDefault">Release Date</label>
+                    <input data-ng-model="Filter.ReleaseDate" type="text" datetime-picker="Filter.ReleaseDate" class="form-control" />
+                </div>
+                <div class="form-group col-md-12 col-xs-6">
+                    <a class="btn btn-primary" ng-click="clearfilter()">Clear</a>
                 </div>
             </div>
-            <div class="col-md-9">
-                <table class="table table-striped">
-                    <tr>
-                        <th>Customer</th>
-                        <th>Build No</th>
-                        <th>Build Date</th>
-                        <th>Release Type</th>
-                        <th>Environment</th>
-                    </tr>
-                    <tr ng-repeat="row in FilterList track by $index" ng-click="edit(row.Id)">
-                        <td>{{row.CustomerName}}</td>
-                        <td>{{row.BuildNumber}}</td>
-                        <td>{{row.BuildDate}}</td>
-                        <td>{{row.ReleaseTypeName}}</td>
-                        <td>{{row.EnvironmentName}}</td>
-                    </tr>
-                    <tr ng-if="!FilterList || FilterList.length==0">
-                        <td colspan="5"><center>no records</center></td>
-                    </tr>
-                </table>
+            <div class="col-md-9">                
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <label>Total Releases {{FilterList.length}}</label>
+                        <label class="pull-right" ng-bind="filterflag"></label>
+                    </div>
+                    <table class="table table-striped">
+                        <tr>
+                            <th>Customer</th>
+                            <th>Build No</th>
+                            <th>Build Date</th>
+                            <th>Release Type</th>
+                            <th>Environment</th>
+                            <th>Status</th>
+                        </tr>
+                        <tr ng-repeat="row in FilterList track by $index" ng-click="edit(row.Id)">
+                            <td>{{row.CustomerName}}</td>
+                            <td>{{row.BuildNumber}}</td>
+                            <td>{{row.BuildDate | date:datetimeformat}}</td>
+                            <td>{{row.ReleaseTypeName}}</td>
+                            <td>{{row.EnvironmentName}}</td>
+                            <td>{{row.Status}}</td>
+                        </tr>
+                        <tr ng-if="!FilterList || FilterList.length==0">
+                            <td colspan="5"><center>no records</center></td>
+                        </tr>
+                    </table>
+                </div>
+
+                
             </div>
               
           </div>

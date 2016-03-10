@@ -43,15 +43,56 @@ namespace Service.Models
         public List<textvalueproperty> GetDashboardData()
         {
             var sql = new StringBuilder();
-            sql.Append(@"   select a.* from (select 'THIS WEEK' [text],'5 DONE / 10 PENDING' [value], 'blue' [cssclass], 1 [sortorder]
-                            union
-                            select 'THIS MONTH' [text],'12 DONE / 20 PENDING' [value], 'red' [cssclass], 2 [sortorder]
-                            union
-                            select 'NEXT MONTH' [text],'40 RELEASES' [value], 'purple' [cssclass], 3 [sortorder]
-                            union
-                            select 'OLD RELEASES' [text],'100 RELEASES' [value], 'green' [cssclass], 4 [sortorder]
-                    ) a order by a.sortorder
-                ");
+            sql.Append(@"    SELECT a.*
+FROM (
+	SELECT 'THIS WEEK' [text]
+	,(case when count(case when a.Status='Planned' then 1 else null end)>0 then cast(count(case when a.Status='Planned' then 1 else null end) as varchar) + ' Planned ' else '' end
+		+ case when count(case when a.Status='Released' then 1 else null end)>0 then cast(count(case when a.Status='Released' then 1 else null end) as varchar) + ' Released' else '' end 
+	)[value]
+		,'blue' [cssclass]
+		,1 [sortorder]
+		,'thisweek' [flag]
+	From ReleaseItems a
+	Where a.ReleaseDate >=dateadd(day, 1-datepart(dw, getdate()), CONVERT(date,getdate())) and a.ReleaseDate<=dateadd(day, 8-datepart(dw, getdate()), CONVERT(date,getdate()))
+
+	UNION
+	
+	SELECT 'THIS MONTH' [text]
+		,(case when count(case when a.Status='Planned' then 1 else null end)>0 then cast(count(case when a.Status='Planned' then 1 else null end) as varchar) + ' Planned ' else '' end
+		+ case when count(case when a.Status='Released' then 1 else null end)>0 then cast(count(case when a.Status='Released' then 1 else null end) as varchar) + ' Released' else '' end 
+	)[value]
+		,'red' [cssclass]
+		,2 [sortorder]
+		,'thismonth' [flag]
+	From ReleaseItems a
+	Where datepart(month,a.ReleaseDate)=datepart(MONTH,getdate())
+	
+	UNION
+	
+	SELECT 'NEXT MONTH' [text]
+		,(case when count(case when isnull(a.Status,'Planned')='Planned' then 1 else null end)>0 then cast(count(case when isnull(a.Status,'Planned')='Planned' then 1 else null end) as varchar) + ' Planned ' else '' end
+		+ case when count(case when a.Status='Released' then 1 else null end)>0 then cast(count(case when a.Status='Released' then 1 else null end) as varchar) + ' Released' else '' end 
+	)[value]
+		,'purple' [cssclass]
+		,3 [sortorder]
+		,'nextmonth' [flag]
+	From ReleaseItems a
+	Where datepart(month,a.ReleaseDate)=datepart(MONTH,getdate())+1
+	
+	UNION
+	
+	SELECT 'OLD RELEASES' [text]
+		,(cast(count(case when a.Status='Released' then 1 else null end) as varchar) + ' Released') [value]
+		,'green' [cssclass]
+		,4 [sortorder]
+		,'oldreleases' [flag]
+	From ReleaseItems a
+	Where datepart(month,a.ReleaseDate)<datepart(MONTH,getdate())
+	) a
+ORDER BY a.sortorder
+
+
+select ReleaseDate, * from ReleaseItems ");
 
             var list = Database.SqlQuery<textvalueproperty>(sql.ToString()).ToList<textvalueproperty>();
             return list;
@@ -59,12 +100,17 @@ namespace Service.Models
 
         public List<ReleaseItem> GetRecentReleases(paramproperty param=null,bool getAll=false)
         {
-            int count = 10;
+            int count = 5;
             //var releases = this.ReleaseItems.OrderByDescending(o => o.Id).Take(count).ToList();
 
             var sql = new StringBuilder();
 
-            sql.AppendFormat(@" SELECT top {0} a.[Id] ,[Customer],[Version],[BuildDate],[BuildNumber],[Environment]
+            sql.Append(" select ");
+
+            if (!getAll)
+                sql.AppendFormat(" top {0} ", count);
+
+            sql.AppendFormat(@" a.[Id] ,[Customer],[Version],[BuildDate],[BuildNumber],[Environment]
                               ,[ReleaseType],[CloudURL],[DNSURL],[MobileURL],[DBServer],[DBName],[Modules]
                               ,[Location],[Subscription],[Hostname],[VMSize],[SharedInstance],[NumberOfInstances]
                               ,ISNULL(b.name,'All') [CustomerName],c.Name [ReleaseTypeName],d.Name [EnvironmentName],e.Name [LocationName],f.Name [SubscriptionName]
@@ -89,6 +135,8 @@ namespace Service.Models
                     sql.AppendFormat(" and a.ReleaseType={0} ", param.ReleaseType);
                 if (string.IsNullOrEmpty(param.BuildDate) == false)
                     sql.AppendFormat(" and a.BuildDate='{0}'",param.BuildDate);
+                if (string.IsNullOrEmpty(param.ReleaseDate) == false)
+                    sql.AppendFormat(" and a.ReleaseDate='{0}'", param.ReleaseDate);
 
                 if (param.flag == "thisweek")
                     sql.Append(" and a.ReleaseDate >=dateadd(day, 1-datepart(dw, getdate()), CONVERT(date,getdate())) and a.ReleaseDate<=dateadd(day, 8-datepart(dw, getdate()), CONVERT(date,getdate()))  ");
@@ -99,7 +147,7 @@ namespace Service.Models
                 else if (param.flag == "nextmonth")
                     sql.Append(" and datepart(month,a.ReleaseDate)=datepart(MONTH,getdate())+1 ");
 
-                else if (param.flag == "oldrelease")
+                else if (param.flag == "oldreleases")
                     sql.Append(" and datepart(month,a.ReleaseDate)<datepart(MONTH,getdate()) ");
 
             }

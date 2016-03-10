@@ -147,10 +147,13 @@ app.controller('MainCtrl', function ($scope, localStorageService, $location, $ro
   $scope.changeMonth=function(index){
     $scope.currentMonth=$scope.months[index];
   }
+  $scope.clearfilter = function () {
+      $scope.Filter = {};
+  }
   $scope.init = function (settings) {
     data = DataService;
     data.init(settings);
-    $scope.Filter = {};
+    $scope.clearfilter();
 
     $scope.$watch('[Item.Environment]', function (values) {
         if (values && values.length > 0 && values[0]) {
@@ -163,13 +166,14 @@ app.controller('MainCtrl', function ($scope, localStorageService, $location, $ro
         }
     });
     if (pagename == 'releaselist.html') {
-        $scope.$watch('[Filter.Customer,Filter.Environment,Filter.ReleaseType,Filter.BuildDate]', function (values) {
+        $scope.$watch('[Filter.Customer,Filter.Environment,Filter.ReleaseType,Filter.BuildDate,Filter.ReleaseDate]', function (values) {
             $scope.FilterReleases();
         });
         $scope.FilterReleases = function () {
-            var p = { Customer: $scope.Filter.Customer, Environment: $scope.Filter.Environment, ReleaseType: $scope.Filter.ReleaseType, BuildDate: $scope.Filter.BuildDate };
+            var p = { Customer: $scope.Filter.Customer, Environment: $scope.Filter.Environment, ReleaseType: $scope.Filter.ReleaseType, BuildDate: $scope.Filter.BuildDate, ReleaseDate: $scope.Filter.ReleaseDate };
             if ($routeParams.flag) {
                 p.flag = $routeParams.flag;
+                $scope.filterflag = p.flag;
             }
             data.getrecentlist(p).then(function (list) {
                 $scope.FilterList = list;

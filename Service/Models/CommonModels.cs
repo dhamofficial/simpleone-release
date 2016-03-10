@@ -13,6 +13,7 @@ namespace Service.Models
         public int Environment { get; set; }
         public int ReleaseType { get; set; }
         public string BuildDate { get; set; }
+        public string ReleaseDate { get; set; }
         public string flag { get; set; }
     }
 
@@ -67,5 +68,6 @@ namespace Service.Models
         public string value { get; set; }
         public string cssclass { get;set;}
         public int sortorder { get; set; }
+        public string flag { get; set; }
     }
 }
